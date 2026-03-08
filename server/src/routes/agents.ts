@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
         description,
         provider,
         model,
-        apiKey: isDemo ? null : encrypt(apiKey),
+        apiKey: isDemo ? undefined : encrypt(apiKey),
         systemPrompt,
         endpointUrl: endpointUrl || null,
         arenaKey,
