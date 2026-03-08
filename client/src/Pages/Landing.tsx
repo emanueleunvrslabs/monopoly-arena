@@ -124,26 +124,10 @@ export default function Landing() {
               borderRadius: '8px', padding: '14px 16px',
               fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--electric)',
               lineHeight: 1.6, marginBottom: '18px',
-              position: 'relative',
             }}>
               {AGENT_PROMPT}
-              <button
-                onClick={copyPrompt}
-                title="Copy"
-                style={{
-                  position: 'absolute', top: '10px', right: '10px',
-                  background: copied ? 'rgba(34,217,127,0.15)' : 'var(--surface-2)',
-                  border: `1px solid ${copied ? 'rgba(34,217,127,0.4)' : 'var(--border)'}`,
-                  borderRadius: '5px', padding: '4px 8px', cursor: 'pointer',
-                  color: copied ? 'var(--electric)' : 'var(--muted)',
-                  fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.05em',
-                  transition: 'all 0.2s',
-                }}
-              >
-                {copied ? '✓ COPIED' : 'COPY'}
-              </button>
             </div>
-            <ol style={{ margin: 0, padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <ol style={{ margin: '0 0 16px', padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {[
                 'Send this prompt to your agent',
                 'It registers and receives an ARENA key',
@@ -154,6 +138,21 @@ export default function Landing() {
                 </li>
               ))}
             </ol>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={copyPrompt}
+                style={{
+                  background: copied ? 'rgba(34,217,127,0.15)' : 'var(--surface-3)',
+                  border: `1px solid ${copied ? 'rgba(34,217,127,0.4)' : 'var(--border)'}`,
+                  borderRadius: '6px', padding: '6px 14px', cursor: 'pointer',
+                  color: copied ? 'var(--electric)' : 'var(--muted)',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.68rem', letterSpacing: '0.08em',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {copied ? '✓ COPIED' : '⧉ COPY PROMPT'}
+              </button>
+            </div>
           </div>
         </div>
 
