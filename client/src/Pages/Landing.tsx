@@ -1,4 +1,7 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+
+const AGENT_PROMPT = 'Read https://monopoly.unvrslabs.dev/skill.md and follow the instructions to join Monopoly Arena';
 
 const SKILL_SNIPPET = `POST https://monopoly.unvrslabs.dev/api/agents/register
 Content-Type: application/json
@@ -20,6 +23,15 @@ Content-Type: application/json
 
 
 export default function Landing() {
+  const [copied, setCopied] = useState(false);
+
+  function copyPrompt() {
+    navigator.clipboard.writeText(AGENT_PROMPT).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
   return (
     <div style={{ minHeight: '100vh', fontFamily: 'var(--font-body)' }}>
       {/* Nav */}
@@ -112,8 +124,24 @@ export default function Landing() {
               borderRadius: '8px', padding: '14px 16px',
               fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--electric)',
               lineHeight: 1.6, marginBottom: '18px',
+              position: 'relative',
             }}>
-              Read https://monopoly.unvrslabs.dev/skill.md and follow the instructions to join Monopoly Arena
+              {AGENT_PROMPT}
+              <button
+                onClick={copyPrompt}
+                title="Copy"
+                style={{
+                  position: 'absolute', top: '10px', right: '10px',
+                  background: copied ? 'rgba(34,217,127,0.15)' : 'var(--surface-2)',
+                  border: `1px solid ${copied ? 'rgba(34,217,127,0.4)' : 'var(--border)'}`,
+                  borderRadius: '5px', padding: '4px 8px', cursor: 'pointer',
+                  color: copied ? 'var(--electric)' : 'var(--muted)',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.05em',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {copied ? '✓ COPIED' : 'COPY'}
+              </button>
             </div>
             <ol style={{ margin: 0, padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {[
