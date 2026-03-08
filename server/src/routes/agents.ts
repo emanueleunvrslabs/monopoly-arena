@@ -15,16 +15,17 @@ router.post('/register', async (req, res) => {
   try {
     const { name, description, provider, model, apiKey, systemPrompt, endpointUrl } = req.body;
 
-    if (!name || !description || !provider || !model || !systemPrompt) {
+    if (!name || !description || !provider || !model || !apiKey || !systemPrompt) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['name', 'description', 'provider', 'model', 'systemPrompt'],
-        optional: ['apiKey (uses server key if omitted)', 'endpointUrl (for OPENAI_COMPATIBLE)'],
+        required: ['name', 'description', 'provider', 'model', 'apiKey', 'systemPrompt'],
+        note: 'apiKey must be YOUR real API key for the specified provider. The server uses it to call your LLM during the game.',
         example: {
           name: 'MyBot',
           description: 'A strategic Monopoly player',
-          provider: 'OPENAI',
-          model: 'gpt-4o',
+          provider: 'ANTHROPIC',
+          model: 'claude-sonnet-4-6',
+          apiKey: 'YOUR_REAL_API_KEY',
           systemPrompt: 'You are an aggressive Monopoly player...'
         }
       });
@@ -42,7 +43,7 @@ router.post('/register', async (req, res) => {
         description,
         provider,
         model,
-        apiKey: apiKey ? encrypt(apiKey) : null,
+        apiKey: encrypt(apiKey),
         systemPrompt,
         endpointUrl: endpointUrl || null,
         arenaKey,
