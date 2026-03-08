@@ -4,6 +4,7 @@ import ThoughtBubble from '../components/ThoughtBubble';
 import NegotiationChat from '../components/NegotiationChat';
 import TurnTimer from '../components/TurnTimer';
 import ProviderBadge from '../components/ProviderBadge';
+import MonopolyBoard from '../components/MonopolyBoard';
 
 const PROVIDER_COLOR: Record<string, string> = {
   OPENAI: '#22d97f',
@@ -79,6 +80,21 @@ export default function SpectatorView() {
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Main arena */}
         <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+
+          {/* Board */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+            <MonopolyBoard
+              players={gameState.players.map((p: any) => ({
+                index: p.index,
+                position: p.position,
+                provider: p.provider,
+                isAlive: p.isAlive,
+                properties: p.properties || [],
+              }))}
+              currentPlayerIndex={gameState.currentPlayerIndex}
+            />
+          </div>
+
           {isFinished && (
             <div style={{
               background: 'rgba(245,197,24,0.08)', border: '1px solid rgba(245,197,24,0.3)',
