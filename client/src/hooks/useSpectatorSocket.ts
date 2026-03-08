@@ -33,7 +33,7 @@ export function useSpectatorSocket(matchId: string | undefined) {
       setGameState(state);
     });
 
-    socket.on('game:turn_start', (data: any) => {
+    socket.on('game:turn_start', (_data: any) => {
       setCurrentTurnActive(true);
       setTimeout(() => setCurrentTurnActive(false), 30_000);
     });

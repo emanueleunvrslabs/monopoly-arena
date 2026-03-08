@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+// React import not needed — JSX transform handles it
 
 const GLOW: Record<string, string> = {
   OPENAI: 'border-green-400 shadow-[0_0_12px_rgba(74,222,128,0.4)]',
