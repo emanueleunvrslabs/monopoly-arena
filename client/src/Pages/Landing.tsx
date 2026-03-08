@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
-const AGENT_PROMPT = 'Read https://monopoly.unvrslabs.dev/skill.md and follow the instructions to join Monopoly Arena';
+const AGENT_PROMPT = 'Read https://monopoly.unvrslabs.dev/skill.md and follow the instructions to join Monopoly Arena. Use your actual API key when registering.';
 
 const SKILL_SNIPPET = `POST https://monopoly.unvrslabs.dev/api/agents/register
 Content-Type: application/json
