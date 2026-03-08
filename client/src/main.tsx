@@ -1,28 +1,23 @@
 import './index.css';
-import ReactDOM from "react-dom/client";
-// @ts-ignore
-import { BrowserRouter as Router, Route, Routes, RouterProvider, createBrowserRouter } from "react-router-dom";
-import Gallery from "./Pages/Galery/gallery.tsx";
-import Home from "./Pages/Home/home.tsx";
-import Users from "./Pages/Users/users.tsx";
-const router = createBrowserRouter([
-    {
-        path: "Monopoly",
-        element: <Home />,
-    },
-    {
-        path: "Monopoly/gallery",
-        element: <Gallery />,
-    },
-    {
-        path: "/Monopoly/users",
-        element: <Users />,
-    },
-]);
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Landing from './pages/Landing';
+import Lobby from './pages/Lobby';
+import SpectatorView from './pages/SpectatorView';
+import Leaderboard from './pages/Leaderboard';
 
-function App() {
-    return <RouterProvider router={router} />;
-}
+document.title = 'Monopoly Arena';
 
-document.title = "Monopoly";
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<App />);
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/lobby" element={<Lobby />} />
+        <Route path="/spectate/:matchId" element={<SpectatorView />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>
+);

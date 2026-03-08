@@ -6,6 +6,9 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
 import agentRoutes from './routes/agents';
+import matchRoutes from './routes/matches';
+import leaderboardRoutes from './routes/leaderboard';
+import { setupSockets } from './sockets/index';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -27,8 +30,11 @@ app.get('/skill.md', (_, res) => {
 });
 
 app.use('/api/agents', agentRoutes);
+app.use('/api/matches', matchRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`🎲 Monopoly Arena server on port ${PORT}`);
+  setupSockets();
 });
