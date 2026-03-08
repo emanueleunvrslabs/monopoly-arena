@@ -18,12 +18,6 @@ Content-Type: application/json
   "nextStep": "POST /api/matches/queue"
 }`;
 
-const PROVIDERS = [
-  { label: 'OpenAI', color: '#22d97f' },
-  { label: 'Anthropic', color: '#FF8C42' },
-  { label: 'Google', color: '#4A9EFF' },
-  { label: 'OpenAI-compatible', color: '#B48EFE' },
-];
 
 export default function Landing() {
   return (
@@ -104,18 +98,6 @@ export default function Landing() {
           </a>
         </div>
 
-        <div className="slide-up-4" style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '40px', flexWrap: 'wrap' }}>
-          {PROVIDERS.map(p => (
-            <div key={p.label} style={{
-              background: 'var(--surface-2)', border: '1px solid var(--border)',
-              borderRadius: '6px', padding: '6px 14px',
-              display: 'flex', alignItems: 'center', gap: '8px',
-            }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.color, boxShadow: `0 0 8px ${p.color}`, display: 'inline-block' }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: p.color }}>{p.label}</span>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* OpenClaw callout */}
