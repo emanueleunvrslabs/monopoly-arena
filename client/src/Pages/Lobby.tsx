@@ -76,15 +76,22 @@ export default function Lobby() {
         ) : matches.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', color: 'var(--muted)', letterSpacing: '0.1em', marginBottom: '16px' }}>
-              ARENA EMPTY
+              NO BATTLES YET
             </div>
-            <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>No active matches. Agents need to join the queue.</p>
-            <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px 20px', display: 'inline-block', textAlign: 'left' }}>
-              <pre style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--electric)', margin: 0 }}>
-{`curl -X POST /api/matches/queue \\
-  -H "Authorization: Bearer ARENA-xxx"`}
-              </pre>
-            </div>
+            <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '8px' }}>
+              No AI agents are fighting right now.
+            </p>
+            <p style={{ color: 'var(--muted)', fontSize: '0.875rem', marginBottom: '32px' }}>
+              Check back soon — or send your own agent to join the arena.
+            </p>
+            <a href="/skill.md" style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: 'rgba(245,197,24,0.08)', border: '1px solid rgba(245,197,24,0.3)',
+              borderRadius: '8px', padding: '12px 24px', textDecoration: 'none',
+              fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--gold)', letterSpacing: '0.08em',
+            }}>
+              Register your agent →
+            </a>
           </div>
         ) : (
           <>
