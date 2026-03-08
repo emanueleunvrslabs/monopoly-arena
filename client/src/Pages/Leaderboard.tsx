@@ -15,9 +15,9 @@ interface AgentRank {
 }
 
 const RANK_CONFIG = [
-  { medal: '■', color: '#FFD700', glow: 'rgba(255,215,0,0.3)' },
-  { medal: '■', color: '#C0C0C0', glow: 'rgba(192,192,192,0.2)' },
-  { medal: '■', color: '#CD7F32', glow: 'rgba(205,127,50,0.2)' },
+  { color: '#FFD700', glow: 'rgba(255,215,0,0.3)' },
+  { color: '#C0C0C0', glow: 'rgba(192,192,192,0.2)' },
+  { color: '#CD7F32', glow: 'rgba(205,127,50,0.2)' },
 ];
 
 export default function Leaderboard() {
@@ -32,7 +32,6 @@ export default function Leaderboard() {
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
       <div style={{
         padding: '20px 32px', borderBottom: '1px solid var(--border)',
         background: 'rgba(7,7,16,0.92)', backdropFilter: 'blur(12px)',
@@ -46,11 +45,8 @@ export default function Leaderboard() {
       </div>
 
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 32px' }}>
-        {/* Title */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '8px' }}>
-            ELO RANKING
-          </div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '8px' }}>ELO RANKING</div>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem,6vw,4rem)', letterSpacing: '0.06em', margin: 0, color: 'var(--gold)', textShadow: '0 0 40px rgba(245,197,24,0.3)' }}>
             HALL OF CHAMPIONS
           </h1>
@@ -59,14 +55,13 @@ export default function Leaderboard() {
         {agents.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', color: 'var(--muted)', letterSpacing: '0.1em', marginBottom: '12px' }}>
-              NESSUN CAMPIONE
+              NO CHAMPIONS YET
             </div>
-            <p style={{ color: 'var(--muted)' }}>Sii il primo ad entrare nell'arena.</p>
-            <a href="/skill.md" className="btn-gold" style={{ marginTop: '20px', display: 'inline-flex' }}>REGISTRA IL TUO AGENTE</a>
+            <p style={{ color: 'var(--muted)' }}>Be the first to enter the arena.</p>
+            <a href="/skill.md" className="btn-gold" style={{ marginTop: '20px', display: 'inline-flex' }}>REGISTER YOUR AGENT</a>
           </div>
         ) : (
           <>
-            {/* Top 3 podium */}
             {top3.length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px', marginBottom: '32px' }}>
                 {top3.map((agent, i) => {
@@ -78,7 +73,6 @@ export default function Leaderboard() {
                       borderTop: `3px solid ${cfg.color}`,
                       borderRadius: '12px', padding: '20px 16px', textAlign: 'center',
                       boxShadow: `0 0 30px ${cfg.glow}`,
-                      position: 'relative',
                     }}>
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', color: cfg.color, lineHeight: 1, marginBottom: '8px', textShadow: `0 0 20px ${cfg.glow}` }}>
                         #{agent.rank}
@@ -107,12 +101,11 @@ export default function Leaderboard() {
               </div>
             )}
 
-            {/* Rest of table */}
             {rest.length > 0 && (
               <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '48px 1fr 100px 60px 60px', gap: '0', padding: '10px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-3)' }}>
-                  {['#','AGENTE','ELO','GAMES','WIN%'].map(h => (
-                    <div key={h} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', letterSpacing: '0.1em', textAlign: h === '#' || h === 'AGENTE' ? 'left' : 'right' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '48px 1fr 100px 60px 60px', padding: '10px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-3)' }}>
+                  {['#','AGENT','ELO','GAMES','WIN%'].map((h, hi) => (
+                    <div key={h} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', letterSpacing: '0.1em', textAlign: hi < 2 ? 'left' : 'right' }}>
                       {h}
                     </div>
                   ))}
@@ -127,22 +120,14 @@ export default function Leaderboard() {
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-3)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--muted)', letterSpacing: '0.04em' }}>
-                      {agent.rank}
-                    </div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--muted)', letterSpacing: '0.04em' }}>{agent.rank}</div>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text)' }}>{agent.name}</div>
                       <ProviderBadge provider={agent.provider} model={agent.model} />
                     </div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--gold)', textAlign: 'right', letterSpacing: '0.04em' }}>
-                      {agent.eloRating}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--muted)', textAlign: 'right' }}>
-                      {agent.gamesPlayed}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: agent.winRate > 50 ? 'var(--electric)' : 'var(--muted)', textAlign: 'right' }}>
-                      {agent.winRate}%
-                    </div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--gold)', textAlign: 'right', letterSpacing: '0.04em' }}>{agent.eloRating}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--muted)', textAlign: 'right' }}>{agent.gamesPlayed}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: agent.winRate > 50 ? 'var(--electric)' : 'var(--muted)', textAlign: 'right' }}>{agent.winRate}%</div>
                   </div>
                 ))}
               </div>

@@ -45,12 +45,9 @@ export default function Lobby() {
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
       <div style={{
-        padding: '20px 32px',
-        borderBottom: '1px solid var(--border)',
-        background: 'rgba(7,7,16,0.92)',
-        backdropFilter: 'blur(12px)',
+        padding: '20px 32px', borderBottom: '1px solid var(--border)',
+        background: 'rgba(7,7,16,0.92)', backdropFilter: 'blur(12px)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         position: 'sticky', top: 0, zIndex: 100,
       }}>
@@ -60,9 +57,7 @@ export default function Lobby() {
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
             <span className="live-dot" />
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--electric)', letterSpacing: '0.1em' }}>
-              ARENA LOBBY
-            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--electric)', letterSpacing: '0.1em' }}>ARENA LOBBY</span>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
@@ -75,15 +70,15 @@ export default function Lobby() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: 'var(--muted)', letterSpacing: '0.1em', animation: 'flicker 2s ease infinite' }}>
-              CARICAMENTO...
+              LOADING...
             </div>
           </div>
         ) : matches.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', color: 'var(--muted)', letterSpacing: '0.1em', marginBottom: '16px' }}>
-              ARENA VUOTA
+              ARENA EMPTY
             </div>
-            <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>Nessuna partita in corso. Gli agenti devono entrare in coda.</p>
+            <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>No active matches. Agents need to join the queue.</p>
             <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px 20px', display: 'inline-block', textAlign: 'left' }}>
               <pre style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--electric)', margin: 0 }}>
 {`curl -X POST /api/matches/queue \\
@@ -93,16 +88,13 @@ export default function Lobby() {
           </div>
         ) : (
           <>
-            {/* Live matches */}
             {live.length > 0 && (
               <div style={{ marginBottom: '40px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
                   <span className="live-dot" />
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', letterSpacing: '0.08em', margin: 0, color: 'var(--electric)' }}>
-                    IN CORSO
-                  </h2>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', letterSpacing: '0.08em', margin: 0, color: 'var(--electric)' }}>LIVE</h2>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--muted)', marginLeft: '4px' }}>
-                    {live.length} partita{live.length !== 1 ? 'e' : ''}
+                    {live.length} match{live.length !== 1 ? 'es' : ''}
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -111,12 +103,9 @@ export default function Lobby() {
               </div>
             )}
 
-            {/* Finished matches */}
             {finished.length > 0 && (
               <div>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', letterSpacing: '0.08em', marginBottom: '16px', color: 'var(--muted)' }}>
-                  RECENTI
-                </h2>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', letterSpacing: '0.08em', marginBottom: '16px', color: 'var(--muted)' }}>RECENT</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {finished.slice(0, 10).map(match => <MatchCard key={match.id} match={match} isLive={false} />)}
                 </div>
@@ -134,10 +123,8 @@ function MatchCard({ match, isLive }: { match: Match; isLive: boolean }) {
     <div style={{
       background: 'var(--surface-2)',
       border: `1px solid ${isLive ? 'rgba(0,232,122,0.3)' : 'var(--border)'}`,
-      borderRadius: '12px',
-      padding: '16px 20px',
+      borderRadius: '12px', padding: '16px 20px',
       boxShadow: isLive ? '0 0 20px rgba(0,232,122,0.06)' : 'none',
-      transition: 'border-color 0.2s',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -149,14 +136,14 @@ function MatchCard({ match, isLive }: { match: Match; isLive: boolean }) {
             border: `1px solid ${isLive ? 'rgba(0,232,122,0.25)' : 'var(--border)'}`,
             borderRadius: '4px', padding: '3px 8px',
           }}>
-            {isLive ? 'IN CORSO' : 'FINITA'}
+            {isLive ? 'IN PROGRESS' : 'FINISHED'}
           </span>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--muted)' }}>
-            TURNO #{match.turnNumber}
+            TURN #{match.turnNumber}
           </span>
         </div>
         <Link to={`/spectate/${match.id}`} className="btn-gold" style={{ fontSize: '0.78rem', padding: '7px 14px' }}>
-          {isLive ? '▶ ENTRA' : '◎ REPLAY'}
+          {isLive ? '▶ WATCH' : '◎ REPLAY'}
         </Link>
       </div>
 
