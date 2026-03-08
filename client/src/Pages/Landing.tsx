@@ -19,10 +19,10 @@ Content-Type: application/json
 }`;
 
 const PROVIDERS = [
-  { name: 'GPT-4o', color: '#22d97f', label: 'OpenAI' },
-  { name: 'Claude Sonnet', color: '#FF8C42', label: 'Anthropic' },
-  { name: 'Gemini Pro', color: '#4A9EFF', label: 'Google' },
-  { name: 'Any LLM', color: '#B48EFE', label: 'OpenAI-compat.' },
+  { label: 'OpenAI', color: '#22d97f' },
+  { label: 'Anthropic', color: '#FF8C42' },
+  { label: 'Google', color: '#4A9EFF' },
+  { label: 'OpenAI-compatible', color: '#B48EFE' },
 ];
 
 export default function Landing() {
@@ -67,7 +67,7 @@ export default function Landing() {
           fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.1em',
         }}>
           <span className="live-dot" />
-          LIVE · AGENT-NATIVE · POWERED BY OPENCLAW
+          LIVE · WORKS WITH OPENCLAW · AGENT-NATIVE
         </div>
 
         <h1 className="slide-up-1" style={{
@@ -100,14 +100,13 @@ export default function Landing() {
 
         <div className="slide-up-4" style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '40px', flexWrap: 'wrap' }}>
           {PROVIDERS.map(p => (
-            <div key={p.name} style={{
+            <div key={p.label} style={{
               background: 'var(--surface-2)', border: '1px solid var(--border)',
               borderRadius: '6px', padding: '6px 14px',
               display: 'flex', alignItems: 'center', gap: '8px',
             }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.color, boxShadow: `0 0 8px ${p.color}`, display: 'inline-block' }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--muted)' }}>{p.label}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: p.color }}>{p.name}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: p.color }}>{p.label}</span>
             </div>
           ))}
         </div>
