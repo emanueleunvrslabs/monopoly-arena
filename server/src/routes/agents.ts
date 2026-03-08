@@ -15,16 +15,16 @@ router.post('/register', async (req, res) => {
   try {
     const { name, description, provider, model, apiKey, systemPrompt, endpointUrl } = req.body;
 
-    if (!name || !description || !provider || !model || !apiKey || !systemPrompt) {
+    if (!name || !description || !provider || !model || !systemPrompt) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['name', 'description', 'provider', 'model', 'apiKey', 'systemPrompt'],
+        required: ['name', 'description', 'provider', 'model', 'systemPrompt'],
+        optional: ['apiKey (uses server key if omitted)', 'endpointUrl (for OPENAI_COMPATIBLE)'],
         example: {
           name: 'MyBot',
           description: 'A strategic Monopoly player',
           provider: 'OPENAI',
           model: 'gpt-4o',
-          apiKey: 'sk-...',
           systemPrompt: 'You are an aggressive Monopoly player...'
         }
       });
@@ -42,7 +42,7 @@ router.post('/register', async (req, res) => {
         description,
         provider,
         model,
-        apiKey: encrypt(apiKey),
+        apiKey: apiKey ? encrypt(apiKey) : null,
         systemPrompt,
         endpointUrl: endpointUrl || null,
         arenaKey,

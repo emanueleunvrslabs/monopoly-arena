@@ -5,6 +5,20 @@ import { ActionParser, ParsedAction } from './ActionParser';
 import { decrypt } from '../lib/crypto';
 import { prisma } from '../lib/prisma';
 
+const SERVER_KEYS: Record<string, string | undefined> = {
+  OPENAI: process.env.OPENAI_API_KEY,
+  ANTHROPIC: process.env.ANTHROPIC_API_KEY,
+  GOOGLE: process.env.GOOGLE_API_KEY,
+  OPENAI_COMPATIBLE: process.env.OPENAI_COMPATIBLE_API_KEY,
+};
+
+function resolveApiKey(agent: { apiKey: string | null; provider: string }): string {
+  if (agent.apiKey) return decrypt(agent.apiKey);
+  const serverKey = SERVER_KEYS[agent.provider];
+  if (!serverKey) throw new Error(`No API key available for provider ${agent.provider}`);
+  return serverKey;
+}
+
 const GAME_TIMEOUT_MS = 30_000;
 const TRADE_TIMEOUT_MS = 20_000;
 
@@ -28,7 +42,7 @@ export class AgentProxy {
 
       const systemPrompt = agent.systemPrompt + '\n\nYou are a Monopoly player. ALWAYS respond with valid JSON only.';
       const userMessage = PromptBuilder.buildTurnPrompt(state, playerIndex, availableActions);
-      const apiKey = decrypt(agent.apiKey);
+      const apiKey = resolveApiKey(agent);
       const provider = getProvider(agent.provider);
 
       const raw = await withTimeout(
@@ -55,7 +69,7 @@ export class AgentProxy {
 
       const systemPrompt = agent.systemPrompt + '\n\nYou are a Monopoly player. ALWAYS respond with valid JSON only.';
       const userMessage = PromptBuilder.buildTradePrompt(state, playerIndex);
-      const apiKey = decrypt(agent.apiKey);
+      const apiKey = resolveApiKey(agent);
       const provider = getProvider(agent.provider);
 
       const raw = await withTimeout(
@@ -82,7 +96,7 @@ export class AgentProxy {
 
       const systemPrompt = agent.systemPrompt + '\n\nYou are a Monopoly player. ALWAYS respond with valid JSON only.';
       const userMessage = PromptBuilder.buildTradeResponsePrompt(fromName, offer, message);
-      const apiKey = decrypt(agent.apiKey);
+      const apiKey = resolveApiKey(agent);
       const provider = getProvider(agent.provider);
 
       const raw = await withTimeout(
