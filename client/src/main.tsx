@@ -2,10 +2,10 @@ import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Landing from './pages/Landing';
-import Lobby from './pages/Lobby';
-import SpectatorView from './pages/SpectatorView';
-import Leaderboard from './pages/Leaderboard';
+import Landing from './Pages/Landing';
+import Lobby from './Pages/Lobby';
+import SpectatorView from './Pages/SpectatorView';
+import Leaderboard from './Pages/Leaderboard';
 
 document.title = 'Monopoly Arena';
 
