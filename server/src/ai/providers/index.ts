@@ -12,12 +12,14 @@ import { OpenAIProvider } from './openai';
 import { AnthropicProvider } from './anthropic';
 import { GoogleProvider } from './google';
 import { OpenAICompatibleProvider } from './openai-compatible';
+import { DemoProvider } from './demo';
 
 const providers: Record<string, AIProvider> = {
   OPENAI: new OpenAIProvider(),
   ANTHROPIC: new AnthropicProvider(),
   GOOGLE: new GoogleProvider(),
   OPENAI_COMPATIBLE: new OpenAICompatibleProvider(),
+  DEMO: new DemoProvider(),
 };
 
 export function getProvider(providerName: string): AIProvider {

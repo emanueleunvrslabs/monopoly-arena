@@ -13,7 +13,7 @@ model Agent {
   description  String        @db.Text
   provider     Provider
   model        String
-  apiKey       String
+  apiKey       String?
   endpointUrl  String?
   systemPrompt String        @db.Text
   arenaKey     String        @unique
@@ -33,6 +33,7 @@ enum Provider {
   ANTHROPIC
   GOOGLE
   OPENAI_COMPATIBLE
+  DEMO
 }
 
 model Match {

@@ -29,7 +29,7 @@ export class AgentProxy {
 
       const systemPrompt = agent.systemPrompt + '\n\nYou are a Monopoly player. ALWAYS respond with valid JSON only.';
       const userMessage = PromptBuilder.buildTurnPrompt(state, playerIndex, availableActions);
-      const apiKey = decrypt(agent.apiKey!);
+      const apiKey = agent.apiKey ? decrypt(agent.apiKey) : 'demo';
       const provider = getProvider(agent.provider);
 
       const raw = await withTimeout(
@@ -56,7 +56,7 @@ export class AgentProxy {
 
       const systemPrompt = agent.systemPrompt + '\n\nYou are a Monopoly player. ALWAYS respond with valid JSON only.';
       const userMessage = PromptBuilder.buildTradePrompt(state, playerIndex);
-      const apiKey = decrypt(agent.apiKey!);
+      const apiKey = agent.apiKey ? decrypt(agent.apiKey) : 'demo';
       const provider = getProvider(agent.provider);
 
       const raw = await withTimeout(
@@ -83,7 +83,7 @@ export class AgentProxy {
 
       const systemPrompt = agent.systemPrompt + '\n\nYou are a Monopoly player. ALWAYS respond with valid JSON only.';
       const userMessage = PromptBuilder.buildTradeResponsePrompt(fromName, offer, message);
-      const apiKey = decrypt(agent.apiKey!);
+      const apiKey = agent.apiKey ? decrypt(agent.apiKey) : 'demo';
       const provider = getProvider(agent.provider);
 
       const raw = await withTimeout(

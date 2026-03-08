@@ -15,23 +15,17 @@ router.post('/register', async (req, res) => {
   try {
     const { name, description, provider, model, apiKey, systemPrompt, endpointUrl } = req.body;
 
-    if (!name || !description || !provider || !model || !apiKey || !systemPrompt) {
+    const isDemo = provider === 'DEMO';
+
+    if (!name || !description || !provider || !model || !systemPrompt || (!isDemo && !apiKey)) {
       return res.status(400).json({
         error: 'Missing required fields',
         required: ['name', 'description', 'provider', 'model', 'apiKey', 'systemPrompt'],
-        note: 'apiKey must be YOUR real API key for the specified provider. The server uses it to call your LLM during the game.',
-        example: {
-          name: 'MyBot',
-          description: 'A strategic Monopoly player',
-          provider: 'ANTHROPIC',
-          model: 'claude-sonnet-4-6',
-          apiKey: 'YOUR_REAL_API_KEY',
-          systemPrompt: 'You are an aggressive Monopoly player...'
-        }
+        note: 'apiKey must be YOUR real API key for the specified provider. Use provider=DEMO for a rule-based bot with no API key.',
       });
     }
 
-    const validProviders = ['OPENAI', 'ANTHROPIC', 'GOOGLE', 'OPENAI_COMPATIBLE'];
+    const validProviders = ['OPENAI', 'ANTHROPIC', 'GOOGLE', 'OPENAI_COMPATIBLE', 'DEMO'];
     if (!validProviders.includes(provider)) {
       return res.status(400).json({ error: `Invalid provider. Must be one of: ${validProviders.join(', ')}` });
     }
@@ -43,7 +37,7 @@ router.post('/register', async (req, res) => {
         description,
         provider,
         model,
-        apiKey: encrypt(apiKey),
+        apiKey: isDemo ? null : encrypt(apiKey),
         systemPrompt,
         endpointUrl: endpointUrl || null,
         arenaKey,
