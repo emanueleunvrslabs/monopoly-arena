@@ -13,6 +13,7 @@
     "dependencies": {
         "@types/crypto-js": "^4.2.2",
         "@types/simple-peer": "^9.11.5",
+        "@types/three": "^0.183.1",
         "@types/ws": "^8.5.5",
         "axios": "^1.4.0",
         "crypto-js": "^4.2.0",
@@ -24,6 +25,7 @@
         "react-router-dom": "^6.30.3",
         "smoke-node": "^0.8.8",
         "socket.io-client": "^4.8.3",
+        "three": "^0.183.2",
         "ws": "^8.13.0"
     },
     "devDependencies": {
