@@ -1,16 +1,18 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useSpectatorSocket } from '../hooks/useSpectatorSocket';
 import ThoughtBubble from '../components/ThoughtBubble';
 import NegotiationChat from '../components/NegotiationChat';
 import TurnTimer from '../components/TurnTimer';
 import ProviderBadge from '../components/ProviderBadge';
 
-const PROVIDER_COLORS: Record<string, string> = {
-  OPENAI: '#22c55e',
-  ANTHROPIC: '#f97316',
-  GOOGLE: '#3b82f6',
-  OPENAI_COMPATIBLE: '#a78bfa',
+const PROVIDER_COLOR: Record<string, string> = {
+  OPENAI: '#22d97f',
+  ANTHROPIC: '#FF8C42',
+  GOOGLE: '#4A9EFF',
+  OPENAI_COMPATIBLE: '#B48EFE',
 };
+
+const PIECE_SYMBOLS = ['◆', '●', '▲', '■'];
 
 export default function SpectatorView() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -18,126 +20,232 @@ export default function SpectatorView() {
 
   if (!gameState) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-spin">🎲</div>
-          <p className="text-gray-400 font-mono">Connessione alla partita...</p>
-          <p className="text-gray-600 text-sm mt-2 font-mono">Match ID: {matchId}</p>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontFamily: 'var(--font-display)', fontSize: '3rem', letterSpacing: '0.1em',
+            color: 'var(--gold)', marginBottom: '16px',
+            animation: 'flicker 2s ease infinite',
+          }}>
+            CONNESSIONE...
+          </div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--muted)' }}>
+            {matchId}
+          </div>
         </div>
       </div>
     );
   }
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+  const isFinished = gameState.status === 'finished';
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-body)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3 bg-gray-900 border-b border-gray-800">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">🎲</span>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '12px 24px',
+        background: 'rgba(7,7,16,0.95)', borderBottom: '1px solid var(--border)',
+        backdropFilter: 'blur(12px)', position: 'sticky', top: 0, zIndex: 100,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Link to="/lobby" style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', letterSpacing: '0.1em', color: 'var(--gold)', textDecoration: 'none' }}>
+            MONOPOLY ARENA
+          </Link>
+          <div style={{ width: '1px', height: '20px', background: 'var(--border)' }} />
           <div>
-            <h1 className="font-bold text-white">Monopoly Arena</h1>
-            <p className="text-gray-400 text-xs font-mono">Turno #{gameState.turnNumber}</p>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--muted)', letterSpacing: '0.1em' }}>
+              TURNO
+            </div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--text)', letterSpacing: '0.04em' }}>
+              #{gameState.turnNumber}
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          {currentPlayer && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-400">Turno di</span>
-              <span className="font-bold" style={{ color: PROVIDER_COLORS[currentPlayer.provider] }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {currentPlayer && !isFinished && (
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', letterSpacing: '0.1em' }}>DI TURNO</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', letterSpacing: '0.06em', color: PROVIDER_COLOR[currentPlayer.provider] || 'var(--gold)' }}>
                 {currentPlayer.agentName}
-              </span>
+              </div>
             </div>
           )}
           <TurnTimer active={currentTurnActive} duration={30} />
-        </div>
-        <div className={`px-3 py-1 rounded-full text-xs font-mono ${
-          gameState.status === 'in_progress' ? 'bg-green-900 text-green-300' : 'bg-gray-800 text-gray-400'
-        }`}>
-          {gameState.status === 'in_progress' ? '🟢 IN CORSO' : '⚫ FINITA'}
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.1em',
+            padding: '4px 10px', borderRadius: '4px',
+            background: isFinished ? 'var(--surface-3)' : 'rgba(0,232,122,0.1)',
+            border: `1px solid ${isFinished ? 'var(--border)' : 'rgba(0,232,122,0.25)'}`,
+            color: isFinished ? 'var(--muted)' : 'var(--electric)',
+          }}>
+            {isFinished ? 'FINITA' : 'LIVE'}
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Main: Players grid */}
-        <div className="flex-1 p-6 overflow-y-auto">
-          {/* Players */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {gameState.players.map((player: any) => (
-              <div
-                key={player.index}
-                className={`relative bg-gray-900 rounded-xl p-4 border transition-all ${
-                  player.index === gameState.currentPlayerIndex && gameState.status === 'in_progress'
-                    ? 'border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.3)]'
-                    : 'border-gray-800'
-                } ${!player.isAlive ? 'opacity-40' : ''}`}
-              >
-                {/* ThoughtBubble */}
-                {thoughts[player.index] && (
-                  <ThoughtBubble
-                    text={thoughts[player.index]}
-                    provider={player.provider}
-                    visible={!!thoughts[player.index]}
-                  />
-                )}
-
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-3 h-3 rounded-full inline-block"
-                        style={{ backgroundColor: PROVIDER_COLORS[player.provider] }}
-                      />
-                      <span className="font-bold text-white">{player.agentName}</span>
-                      {!player.isAlive && <span className="text-red-400 text-xs">💀 Bankrupt</span>}
-                      {player.isInJail && <span className="text-yellow-400 text-xs">🔒 Prigione</span>}
-                    </div>
-                    <ProviderBadge provider={player.provider} model={player.model} />
-                  </div>
-                  <div className="text-right">
-                    <div className="text-green-400 font-bold text-lg">€{player.money.toLocaleString()}</div>
-                    <div className="text-gray-500 text-xs">pos. {player.position}</div>
-                  </div>
-                </div>
-
-                {/* Proprietà */}
-                {player.properties && player.properties.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {player.properties.slice(0, 6).map((prop: any, i: number) => (
-                      <span key={i} className="text-xs bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded">
-                        #{prop.squareId}
-                        {prop.houses > 0 && <span className="text-yellow-400 ml-1">{'🏠'.repeat(Math.min(prop.houses, 4))}{prop.houses === 5 ? '🏨' : ''}</span>}
-                      </span>
-                    ))}
-                    {player.properties.length > 6 && (
-                      <span className="text-xs text-gray-500">+{player.properties.length - 6}</span>
-                    )}
-                  </div>
-                )}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Main arena */}
+        <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+          {/* Game over banner */}
+          {isFinished && (
+            <div style={{
+              background: 'rgba(245,197,24,0.08)', border: '1px solid rgba(245,197,24,0.3)',
+              borderRadius: '12px', padding: '24px', textAlign: 'center', marginBottom: '24px',
+              boxShadow: '0 0 40px rgba(245,197,24,0.1)',
+            }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', color: 'var(--gold)', letterSpacing: '0.1em', textShadow: '0 0 30px rgba(245,197,24,0.5)' }}>
+                PARTITA TERMINATA
               </div>
-            ))}
-          </div>
-
-          {/* Match finished */}
-          {gameState.status === 'finished' && (
-            <div className="bg-yellow-900/30 border border-yellow-700 rounded-xl p-6 text-center">
-              <div className="text-4xl mb-2">🏆</div>
-              <h2 className="text-xl font-bold text-yellow-400">Partita Terminata!</h2>
-              <p className="text-gray-300 mt-1">
-                Vincitore: {gameState.players.find((p: any) => p.agentId === (gameState as any).winnerId)?.agentName || 'TBD'}
-              </p>
+              <div style={{ color: 'var(--muted)', marginTop: '8px' }}>
+                Vincitore: <span style={{ color: 'var(--gold)', fontWeight: 600 }}>
+                  {gameState.players.find((p: any) => p.agentId === (gameState as any).winnerId)?.agentName || 'N/D'}
+                </span>
+              </div>
             </div>
           )}
+
+          {/* Player grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: gameState.players.length <= 2 ? '1fr 1fr' : 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '16px',
+          }}>
+            {gameState.players.map((player: any) => {
+              const isActive = player.index === gameState.currentPlayerIndex && !isFinished;
+              const color = PROVIDER_COLOR[player.provider] || '#888';
+              return (
+                <div key={player.index} style={{
+                  background: 'var(--surface-2)',
+                  border: `1px solid ${isActive ? color : player.isAlive ? 'var(--border)' : 'var(--border)'}`,
+                  borderTop: `3px solid ${player.isAlive ? color : 'var(--border)'}`,
+                  borderRadius: '12px', padding: '16px',
+                  opacity: player.isAlive ? 1 : 0.45,
+                  position: 'relative',
+                  boxShadow: isActive ? `0 0 24px ${color}30, 0 0 0 1px ${color}20` : 'none',
+                  animation: isActive ? 'pulse-glow 2.5s ease-in-out infinite' : 'none',
+                  transition: 'border-color 0.3s, box-shadow 0.3s',
+                }}>
+                  {/* Thought bubble */}
+                  {thoughts[player.index] && (
+                    <ThoughtBubble
+                      text={thoughts[player.index]}
+                      provider={player.provider}
+                      visible={!!thoughts[player.index]}
+                    />
+                  )}
+
+                  {/* Active indicator */}
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute', top: '12px', right: '12px',
+                      display: 'flex', alignItems: 'center', gap: '5px',
+                    }}>
+                      <span className="live-dot" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color, letterSpacing: '0.1em' }}>TURNO</span>
+                    </div>
+                  )}
+
+                  {/* Player info */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '12px' }}>
+                    <div style={{
+                      width: '36px', height: '36px', borderRadius: '8px',
+                      background: `${color}20`, border: `1px solid ${color}40`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontFamily: 'var(--font-display)', fontSize: '1.2rem', color, flexShrink: 0,
+                    }}>
+                      {PIECE_SYMBOLS[player.index] || '○'}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '3px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {player.agentName}
+                        </span>
+                        {!player.isAlive && (
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--danger)', background: 'rgba(255,59,59,0.1)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: '4px', padding: '1px 6px', letterSpacing: '0.08em' }}>
+                            BANKRUPT
+                          </span>
+                        )}
+                        {player.isInJail && (
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#FEBC2E', background: 'rgba(254,188,46,0.1)', border: '1px solid rgba(254,188,46,0.2)', borderRadius: '4px', padding: '1px 6px', letterSpacing: '0.08em' }}>
+                            IN PRIGIONE
+                          </span>
+                        )}
+                      </div>
+                      <ProviderBadge provider={player.provider} model={player.model} />
+                    </div>
+                  </div>
+
+                  {/* Stats row */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--muted)', letterSpacing: '0.08em' }}>LIQUIDITÀ</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--electric)', letterSpacing: '0.04em' }}>
+                        €{player.money?.toLocaleString() ?? 0}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--muted)', letterSpacing: '0.08em' }}>POSIZIONE</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--text)', letterSpacing: '0.04em' }}>
+                        {player.position}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Properties */}
+                  {player.properties && player.properties.length > 0 && (
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--muted)', letterSpacing: '0.08em', marginBottom: '5px' }}>
+                        PROPRIETÀ ({player.properties.length})
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {player.properties.slice(0, 8).map((prop: any, i: number) => (
+                          <span key={i} style={{
+                            fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+                            background: 'var(--surface-3)', color: 'var(--muted)',
+                            border: '1px solid var(--border)', borderRadius: '4px',
+                            padding: '2px 6px',
+                          }}>
+                            #{prop.squareId}
+                            {prop.houses > 0 && (
+                              <span style={{ color: 'var(--gold)', marginLeft: '3px' }}>
+                                {prop.houses === 5 ? 'H' : '▪'.repeat(prop.houses)}
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                        {player.properties.length > 8 && (
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--muted)', padding: '2px 4px' }}>
+                            +{player.properties.length - 8}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Sidebar: Negoziazioni */}
-        <div className="w-72 bg-gray-900 border-l border-gray-800 flex flex-col">
-          <div className="px-4 py-3 border-b border-gray-800">
-            <h2 className="font-bold text-white text-sm">💬 Negoziazioni</h2>
-            <p className="text-gray-500 text-xs">Chat live tra agenti</p>
+        {/* Sidebar: Negotiations */}
+        <div style={{
+          width: '280px', borderLeft: '1px solid var(--border)',
+          display: 'flex', flexDirection: 'column',
+          background: 'var(--surface-2)',
+        }}>
+          <div style={{
+            padding: '14px 16px', borderBottom: '1px solid var(--border)',
+            background: 'var(--surface-3)',
+          }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', letterSpacing: '0.1em', marginBottom: '2px' }}>NEGOZIAZIONI</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', letterSpacing: '0.08em' }}>
+              CHAT LIVE TRA AGENTI
+            </div>
           </div>
-          <div className="flex-1 overflow-hidden">
+          <div style={{ flex: 1, overflowY: 'auto' }}>
             <NegotiationChat messages={negotiations} />
           </div>
         </div>

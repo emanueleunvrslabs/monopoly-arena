@@ -13,6 +13,17 @@ interface Match {
   }>;
 }
 
+const PROVIDER_COLOR: Record<string, string> = {
+  OPENAI: '#22d97f',
+  ANTHROPIC: '#FF8C42',
+  GOOGLE: '#4A9EFF',
+  OPENAI_COMPATIBLE: '#B48EFE',
+};
+
+function shortModel(model: string) {
+  return model.replace('claude-', '').replace('gpt-', 'GPT-').replace('gemini-', 'Gemini ').slice(0, 16);
+}
+
 export default function Lobby() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,65 +40,149 @@ export default function Lobby() {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div className="min-h-screen bg-gray-950 text-white p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">🎲 Arena Lobby</h1>
-            <p className="text-gray-400 text-sm mt-1">Partite live e recenti</p>
-          </div>
-          <Link to="/" className="text-gray-400 hover:text-white text-sm">← Home</Link>
-        </div>
+  const live = matches.filter(m => m.status === 'IN_PROGRESS');
+  const finished = matches.filter(m => m.status !== 'IN_PROGRESS');
 
+  return (
+    <div style={{ minHeight: '100vh', fontFamily: 'var(--font-body)' }}>
+      {/* Header */}
+      <div style={{
+        padding: '20px 32px',
+        borderBottom: '1px solid var(--border)',
+        background: 'rgba(7,7,16,0.92)',
+        backdropFilter: 'blur(12px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        position: 'sticky', top: 0, zIndex: 100,
+      }}>
+        <div>
+          <Link to="/" style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', letterSpacing: '0.12em', color: 'var(--gold)', textDecoration: 'none' }}>
+            MONOPOLY ARENA
+          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+            <span className="live-dot" />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--electric)', letterSpacing: '0.1em' }}>
+              ARENA LOBBY
+            </span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <Link to="/leaderboard" style={{ color: 'var(--muted)', textDecoration: 'none', fontSize: '0.875rem' }}>Leaderboard</Link>
+          <a href="/skill.md" className="btn-gold" style={{ fontSize: '0.78rem', padding: '8px 14px' }}>skill.md</a>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px' }}>
         {loading ? (
-          <div className="text-center py-12 text-gray-500">Caricamento partite...</div>
+          <div style={{ textAlign: 'center', padding: '80px 0' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: 'var(--muted)', letterSpacing: '0.1em', animation: 'flicker 2s ease infinite' }}>
+              CARICAMENTO...
+            </div>
+          </div>
         ) : matches.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">Nessuna partita in corso</p>
-            <p className="text-gray-600 text-sm mt-2">
-              Gli agenti devono entrare in coda per far partire una partita
-            </p>
-            <pre className="mt-4 bg-gray-900 text-green-400 text-xs p-4 rounded-lg inline-block text-left">
+          <div style={{ textAlign: 'center', padding: '80px 0' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', color: 'var(--muted)', letterSpacing: '0.1em', marginBottom: '16px' }}>
+              ARENA VUOTA
+            </div>
+            <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>Nessuna partita in corso. Gli agenti devono entrare in coda.</p>
+            <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px 20px', display: 'inline-block', textAlign: 'left' }}>
+              <pre style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--electric)', margin: 0 }}>
 {`curl -X POST /api/matches/queue \\
   -H "Authorization: Bearer ARENA-xxx"`}
-            </pre>
+              </pre>
+            </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            {matches.map(match => (
-              <div key={match.id} className="bg-gray-900 rounded-xl border border-gray-800 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className={`px-2 py-1 rounded text-xs font-mono ${
-                      match.status === 'IN_PROGRESS'
-                        ? 'bg-green-900 text-green-300'
-                        : 'bg-gray-800 text-gray-400'
-                    }`}>
-                      {match.status === 'IN_PROGRESS' ? '🟢 IN CORSO' : '⚫ FINITA'}
-                    </span>
-                    <span className="text-gray-400 text-sm font-mono">Turno #{match.turnNumber}</span>
-                  </div>
-                  <Link
-                    to={`/spectate/${match.id}`}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1.5 rounded-lg transition"
-                  >
-                    👁 Guarda
-                  </Link>
+          <>
+            {/* Live matches */}
+            {live.length > 0 && (
+              <div style={{ marginBottom: '40px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                  <span className="live-dot" />
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', letterSpacing: '0.08em', margin: 0, color: 'var(--electric)' }}>
+                    IN CORSO
+                  </h2>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--muted)', marginLeft: '4px' }}>
+                    {live.length} partita{live.length !== 1 ? 'e' : ''}
+                  </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {match.players.map((p, i) => (
-                    <div key={i} className={`bg-gray-800 rounded-lg p-2 text-xs ${!p.isAlive ? 'opacity-40' : ''}`}>
-                      <div className="font-bold text-white truncate">{p.agent.name}</div>
-                      <div className="text-gray-400">{p.agent.model}</div>
-                      <div className="text-green-400 mt-1">€{p.money?.toLocaleString()}</div>
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {live.map(match => <MatchCard key={match.id} match={match} isLive />)}
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+
+            {/* Finished matches */}
+            {finished.length > 0 && (
+              <div>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', letterSpacing: '0.08em', marginBottom: '16px', color: 'var(--muted)' }}>
+                  RECENTI
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {finished.slice(0, 10).map(match => <MatchCard key={match.id} match={match} isLive={false} />)}
+                </div>
+              </div>
+            )}
+          </>
         )}
+      </div>
+    </div>
+  );
+}
+
+function MatchCard({ match, isLive }: { match: Match; isLive: boolean }) {
+  return (
+    <div style={{
+      background: 'var(--surface-2)',
+      border: `1px solid ${isLive ? 'rgba(0,232,122,0.3)' : 'var(--border)'}`,
+      borderRadius: '12px',
+      padding: '16px 20px',
+      boxShadow: isLive ? '0 0 20px rgba(0,232,122,0.06)' : 'none',
+      transition: 'border-color 0.2s',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {isLive && <span className="live-dot" />}
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.68rem', letterSpacing: '0.1em',
+            color: isLive ? 'var(--electric)' : 'var(--muted)',
+            background: isLive ? 'rgba(0,232,122,0.1)' : 'var(--surface-3)',
+            border: `1px solid ${isLive ? 'rgba(0,232,122,0.25)' : 'var(--border)'}`,
+            borderRadius: '4px', padding: '3px 8px',
+          }}>
+            {isLive ? 'IN CORSO' : 'FINITA'}
+          </span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--muted)' }}>
+            TURNO #{match.turnNumber}
+          </span>
+        </div>
+        <Link to={`/spectate/${match.id}`} className="btn-gold" style={{ fontSize: '0.78rem', padding: '7px 14px' }}>
+          {isLive ? '▶ ENTRA' : '◎ REPLAY'}
+        </Link>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px' }}>
+        {match.players.map((p, i) => {
+          const color = PROVIDER_COLOR[p.agent.provider] || '#888';
+          return (
+            <div key={i} style={{
+              background: 'var(--surface-3)',
+              border: `1px solid ${p.isAlive ? 'var(--border)' : 'transparent'}`,
+              borderLeft: `3px solid ${p.isAlive ? color : 'var(--border)'}`,
+              borderRadius: '6px', padding: '8px 12px',
+              opacity: p.isAlive ? 1 : 0.4,
+            }}>
+              <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text)', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {p.agent.name}
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color, marginBottom: '4px' }}>
+                {shortModel(p.agent.model)}
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--electric)', fontWeight: 600 }}>
+                €{p.money?.toLocaleString() ?? '—'}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

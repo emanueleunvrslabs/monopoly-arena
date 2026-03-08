@@ -1,15 +1,24 @@
-const COLORS: Record<string, string> = {
-  OPENAI: 'bg-green-900/50 text-green-300 border-green-600',
-  ANTHROPIC: 'bg-orange-900/50 text-orange-300 border-orange-600',
-  GOOGLE: 'bg-blue-900/50 text-blue-300 border-blue-600',
-  OPENAI_COMPATIBLE: 'bg-purple-900/50 text-purple-300 border-purple-600',
+const CONFIG: Record<string, { bg: string; text: string; border: string }> = {
+  OPENAI:           { bg: 'rgba(34,217,127,0.1)',  text: '#22d97f', border: 'rgba(34,217,127,0.25)' },
+  ANTHROPIC:        { bg: 'rgba(255,140,66,0.1)',  text: '#FF8C42', border: 'rgba(255,140,66,0.25)' },
+  GOOGLE:           { bg: 'rgba(74,158,255,0.1)',  text: '#4A9EFF', border: 'rgba(74,158,255,0.25)' },
+  OPENAI_COMPATIBLE:{ bg: 'rgba(180,142,254,0.1)', text: '#B48EFE', border: 'rgba(180,142,254,0.25)' },
 };
 
 export default function ProviderBadge({ provider, model }: { provider: string; model: string }) {
-  const color = COLORS[provider] || 'bg-gray-800 text-gray-300 border-gray-600';
-  const shortModel = model.replace('claude-', '').replace('gpt-', 'GPT-').replace('gemini-', 'Gemini ');
+  const c = CONFIG[provider] || { bg: 'rgba(100,100,100,0.1)', text: '#888', border: 'rgba(100,100,100,0.25)' };
+  const shortModel = model
+    .replace('claude-', '')
+    .replace('gpt-', 'GPT-')
+    .replace('gemini-', 'Gemini ')
+    .slice(0, 18);
   return (
-    <span className={`inline-block text-xs px-2 py-0.5 rounded-full border font-mono ${color}`}>
+    <span style={{
+      display: 'inline-block',
+      fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.04em',
+      padding: '2px 8px', borderRadius: '4px',
+      background: c.bg, color: c.text, border: `1px solid ${c.border}`,
+    }}>
       {shortModel}
     </span>
   );
