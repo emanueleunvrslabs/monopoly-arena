@@ -74,6 +74,13 @@ async function runGameLoop(matchId: string, engine: GameEngine, agentDbIds: stri
     spectNs.to(matchId).emit(event, data);
   };
 
+  const emitThought = (playerIndex: number, reasoning: string) => {
+    if (!reasoning) return;
+    const lower = reasoning.toLowerCase();
+    if (lower.includes('error') || lower.includes('parse') || lower.includes('timeout') || lower.includes('llm')) return;
+    emit('spectator:thought', { playerIndex, reasoning });
+  };
+
   while (engine.getState().status === 'in_progress') {
     const state = engine.getState();
     const playerIndex = state.currentPlayerIndex;
@@ -105,7 +112,7 @@ async function runGameLoop(matchId: string, engine: GameEngine, agentDbIds: stri
       } else {
         emit('game:action', { playerIndex, actionType: 'JAIL_TURN', data: { dice, jailTurns: player.jailTurns } });
         engine.nextTurn();
-        await sleep(800);
+        await sleep(2500);
         continue;
       }
     }
@@ -159,7 +166,7 @@ async function runGameLoop(matchId: string, engine: GameEngine, agentDbIds: stri
         const action = await proxy.getAction(engine.getState(), playerIndex, availableActions, agentDbId);
 
         // Emetti thought bubble
-        emit('spectator:thought', { playerIndex, reasoning: action.reasoning || '' });
+        emitThought(playerIndex, action.reasoning || '');
 
         if (action.type === 'buy_property') {
           const bought = engine.buyProperty(playerIndex, newPosition);
@@ -214,13 +221,13 @@ async function runGameLoop(matchId: string, engine: GameEngine, agentDbIds: stri
         emit('game:action', { playerIndex, actionType: 'JAIL_TRIPLE_DOUBLE', data: {} });
       } else {
         // Continua stesso turno
-        await sleep(500);
+        await sleep(2000);
         continue;
       }
     }
 
     engine.nextTurn();
-    await sleep(600);
+    await sleep(2500);
 
     // Sync stato al DB ogni 10 turni
     if (engine.getState().turnNumber % 10 === 0) {
@@ -300,7 +307,10 @@ async function buildPhase(
     agentDbId
   );
 
-  emit('spectator:thought', { playerIndex, reasoning: action.reasoning || '' });
+  const buildReasoning = action.reasoning || '';
+  if (buildReasoning && !buildReasoning.toLowerCase().match(/error|parse|timeout|llm/)) {
+    emit('spectator:thought', { playerIndex, reasoning: buildReasoning });
+  }
 
   if (action.type === 'build_house' && action.squareId !== undefined) {
     const built = engine.buildHouse(playerIndex, action.squareId);
@@ -333,7 +343,10 @@ async function negotiationPhase(
 
     const tradeAction = await proxy.getTradeProposal(engine.getState(), playerIndex, agentDbId);
 
-    emit('spectator:thought', { playerIndex, reasoning: tradeAction.reasoning || '' });
+    const tradeReasoning = tradeAction.reasoning || '';
+    if (tradeReasoning && !tradeReasoning.toLowerCase().match(/error|parse|timeout|llm/)) {
+      emit('spectator:thought', { playerIndex, reasoning: tradeReasoning });
+    }
 
     if (tradeAction.type !== 'propose_trade' || !tradeAction.offer) break;
 
@@ -360,7 +373,10 @@ async function negotiationPhase(
     const fromName = engine.getState().players[playerIndex].agentName;
     const response = await proxy.getTradeResponse(fromName, offer, message || '', targetDbId);
 
-    emit('spectator:thought', { playerIndex: targetPlayerIndex, reasoning: response.reasoning || '' });
+    const respReasoning = response.reasoning || '';
+    if (respReasoning && !respReasoning.toLowerCase().match(/error|parse|timeout|llm/)) {
+      emit('spectator:thought', { playerIndex: targetPlayerIndex, reasoning: respReasoning });
+    }
     emit('game:trade_response', {
       fromPlayer: targetPlayerIndex,
       toPlayer: playerIndex,
