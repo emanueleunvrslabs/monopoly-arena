@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
+import agentRoutes from './routes/agents';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -24,6 +25,8 @@ app.get('/skill.md', (_, res) => {
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.sendFile(path.join(__dirname, '../../public/skill.md'));
 });
+
+app.use('/api/agents', agentRoutes);
 
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
